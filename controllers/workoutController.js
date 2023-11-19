@@ -1,6 +1,14 @@
 const { getWorkouts, getWorkout, insertWorkout, updateWorkout, deleteWorkout } = require('../services/workoutService');
 const { validationResult } = require('express-validator');
 
+/**
+ * Controller to retrieve all workouts for a user.
+ * This function handles the HTTP request and response for getting workouts associated with a user.
+ * It extracts the userID from the request body and uses the `getWorkouts` service to retrieve the workouts.
+ * 
+ * @param {Object} req - The request object, containing the userID.
+ * @param {Object} res - The response object.
+ */
 const getWorkoutsController = async (req, res) => {
     const { userID } = req.body;
     try {
@@ -11,6 +19,14 @@ const getWorkoutsController = async (req, res) => {
     }
 };
 
+/**
+ * Controller to retrieve a specific workout by its ID.
+ * This function handles the HTTP request and response for getting a specific workout.
+ * It extracts the workoutID from the request body and uses the `getWorkout` service to retrieve the workout.
+ * 
+ * @param {Object} req - The request object containing workoutID.
+ * @param {Object} res - The response object.
+ */
 const getWorkoutController = async (req, res) => {
     const { workoutID } = req.body;
     try {
@@ -21,6 +37,15 @@ const getWorkoutController = async (req, res) => {
     }
 };
 
+/**
+ * Controller to insert a new workout.
+ * This function handles the HTTP request and response for adding a new workout.
+ * It performs validation checks on the request, extracts the workout details from the request body, 
+ * and uses the `insertWorkout` service to store the new workout.
+ * 
+ * @param {Object} req - The request object containing workout details.
+ * @param {Object} res - The response object.
+ */
 const insertWorkoutController = async (req, res) => {
     const errors = validationResult(req);
 
@@ -36,6 +61,15 @@ const insertWorkoutController = async (req, res) => {
     }
 };
 
+/**
+ * Controller to update an existing workout.
+ * This function handles the HTTP request and response for updating a workout's details.
+ * It performs validation checks on the request, extracts the updated workout details from the request body, 
+ * and uses the `updateWorkout` service to update the workout.
+ * 
+ * @param {Object} req - The request object containing updated workout details.
+ * @param {Object} res - The response object.
+ */
 const updateWorkoutController = async (req, res) => {
     const errors = validationResult(req);
 
@@ -51,6 +85,14 @@ const updateWorkoutController = async (req, res) => {
     }
 };
 
+/**
+ * Controller to delete a workout.
+ * This function handles the HTTP request and response for deleting a workout.
+ * It extracts the workoutID from the request body and uses the `deleteWorkout` service to delete the workout.
+ * 
+ * @param {Object} req - The request object containing workoutID.
+ * @param {Object} res - The response object.
+ */
 const deleteWorkoutController = async (req, res) => {
     const { workoutID } = req.body; // Assuming workoutID is in the body, but it could be in the params
     try {

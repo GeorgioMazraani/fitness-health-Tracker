@@ -1,9 +1,14 @@
-const {getSettingsController,saveSettingsController}=require('../controllers/settingController');
-const express=require('express');
-const router=express.Router();
-const {saveSettingsValidation}=require('../validations/setting-validator');
+// Importing required modules and controllers
+const express = require('express');
+const { getSettingsController, saveSettingsController } = require('../controllers/settingController');
+const { saveSettingsValidation } = require('../validations/setting-validator');
+const router = express.Router();
 
-router.get('/settings',getSettingsController);
-router.post('/settings',saveSettingsValidation,saveSettingsController);
+// Route to get settings for a user
+router.get('/settings', getSettingsController);
 
-module.exports=router;
+// Route to save or update settings
+router.post('/settings', saveSettingsValidation, saveSettingsController);
+
+// Exporting the router
+module.exports = router;

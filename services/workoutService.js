@@ -1,6 +1,12 @@
 const { query } = require('../database/db');
 const moment = require('moment');
-const { addAchievement,checkForNewBadge } = require('../services/achievementService'); 
+const { addAchievement, checkForNewBadge } = require('../services/achievementService');
+
+/**
+ * Retrieves all workout entries for a given user.
+ * @param {number} userID - The user's unique identifier.
+ * @returns {Promise<Object[]>} A promise that resolves to an array of workout objects.
+ */
 const getWorkouts = async (userID) => {
     try {
         let sql = "SELECT * FROM workouts WHERE userID=?";
@@ -11,6 +17,11 @@ const getWorkouts = async (userID) => {
     }
 };
 
+/**
+ * Retrieves a specific workout by its ID.
+ * @param {number} workoutID - The unique identifier of the workout.
+ * @returns {Promise<Object>} A promise that resolves to a workout object.
+ */
 const getWorkout = async (workoutID) => {
     try {
         let sql = "SELECT * FROM workouts WHERE workoutID=?";
@@ -21,6 +32,11 @@ const getWorkout = async (workoutID) => {
     }
 };
 
+/**
+ * Inserts a new workout entry for a user and checks for any new achievements.
+ * @param {Object} workout - The workout object containing userID, workoutName, workoutDate, duration, and caloriesBurned.
+ * @returns {Promise<Object>} A promise that resolves to the newly inserted workout object.
+ */
 const insertWorkout = async (workout) => {
     try {
         let insertSql = `
@@ -40,7 +56,7 @@ const insertWorkout = async (workout) => {
             await addAchievement({
                 userID: workout.userID,
                 badgeName: newBadge,
-                dateEarned: new Date() 
+                dateEarned: new Date()
             });
         }
 
@@ -51,7 +67,11 @@ const insertWorkout = async (workout) => {
     }
 };
 
-
+/**
+ * Updates an existing workout entry.
+ * @param {Object} workout - The workout object containing workoutID, userID, workoutName, workoutDate, duration, and caloriesBurned.
+ * @returns {Promise<void>} A promise that resolves when the workout is updated.
+ */
 const updateWorkout = async (workout) => {
     try {
         let updateSql = `
@@ -70,6 +90,11 @@ const updateWorkout = async (workout) => {
     }
 };
 
+/**
+ * Deletes a workout entry based on the provided workoutID.
+ * @param {number} workoutID - The unique identifier of the workout to be deleted.
+ * @returns {Promise<void>} A promise that resolves when the workout is deleted.
+ */
 const deleteWorkout = async (workoutID) => {
     try {
         let deleteSql = "DELETE FROM workouts WHERE workoutID = ?";

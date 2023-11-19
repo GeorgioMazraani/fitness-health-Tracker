@@ -1,6 +1,11 @@
 const { query } = require('../database/db');
 const moment = require('moment');
 
+/**
+ * Retrieves all meal entries for a given user.
+ * @param {number} userID - The user's unique identifier.
+ * @returns {Promise<Object[]>} A promise that resolves to an array of meal objects.
+ */
 const getMeals = async (userID) => {
     try {
         let selectSql = `SELECT * FROM meals WHERE userID = ?`;
@@ -11,6 +16,11 @@ const getMeals = async (userID) => {
     }
 };
 
+/**
+ * Retrieves a specific meal by its ID.
+ * @param {number} mealID - The unique identifier of the meal.
+ * @returns {Promise<Object>} A promise that resolves to a meal object.
+ */
 const getMeal = async (mealID) => {
     try {
         let selectSql = `SELECT * FROM meals WHERE mealID = ?`;
@@ -21,6 +31,11 @@ const getMeal = async (mealID) => {
     }
 };
 
+/**
+ * Saves a meal entry. If the meal entry exists, it updates; otherwise, it creates a new entry.
+ * @param {Object} meal - The meal object containing userID, categoryID, mealName, mealDate, calories, proteins, carbs, and fats.
+ * @returns {Promise<Object>} A promise that resolves to the saved meal object.
+ */
 const saveMeal = async (meal) => {
     try {
         let insertSql = `
@@ -36,8 +51,6 @@ const saveMeal = async (meal) => {
             meal.carbs,
             meal.fats]);
 
-        // Retrieve the last inserted meal for the given userID
-        // Correctly reference meal.userID instead of a non-existent userID variable
         let insertedMeal = await query("SELECT * FROM meals WHERE userID = ? ORDER BY mealID DESC LIMIT 1", [meal.userID]);
 
         return insertedMeal;
@@ -46,6 +59,11 @@ const saveMeal = async (meal) => {
     }
 };
 
+/**
+ * Modifies an existing meal entry.
+ * @param {Object} meal - The meal object containing mealID, userID, categoryID, mealName, mealDate, calories, proteins, carbs, and fats.
+ * @returns {Promise<void>} A promise that resolves when the meal is updated.
+ */
 const modifyMeal = async (meal) => {
     try {
         let updateSql = `
@@ -65,6 +83,12 @@ const modifyMeal = async (meal) => {
         throw new Error(error);
     }
 };
+
+/**
+ * Deletes a meal entry based on the provided mealID.
+ * @param {number} mealID - The unique identifier of the meal to be deleted.
+ * @returns {Promise<void>} A promise that resolves when the meal is deleted.
+ */
 const deleteMeal = async (mealID) => {
     mealID = parseInt(mealID, 10);
     try {

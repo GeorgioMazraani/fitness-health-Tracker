@@ -1,6 +1,14 @@
 const { getMeals, getMeal, saveMeal, modifyMeal, deleteMeal } = require('../services/mealService');
 const { validationResult } = require('express-validator');
 
+/**
+ * Controller for retrieving all meals of a user.
+ * This function handles the HTTP request and response for getting all meals associated with a user.
+ * It extracts the userID from the request parameters and uses the `getAllMeals` service to retrieve the meals.
+ * 
+ * @param {Object} req - The HTTP request object, containing the userID in the params.
+ * @param {Object} res - The HTTP response object used to return the meals or an error message.
+ */
 const getMealsController = async (req, res) => {
     const { userID } = req.body;
     try {
@@ -9,8 +17,16 @@ const getMealsController = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
+/**
+ * Controller for retrieving a specific meal.
+ * This function handles the HTTP request and response for getting a specific meal by its ID.
+ * It extracts the mealID from the request parameters and uses the `getMeal` service to retrieve the meal.
+ * 
+ * @param {Object} req - The HTTP request object, containing the mealID in the params.
+ * @param {Object} res - The HTTP response object used to return the meal or an error message.
+ */
 const getMealController = async (req, res) => {
     const { mealID } = req.body;
     try {
@@ -19,7 +35,16 @@ const getMealController = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
+
+/**
+ * Controller for adding a meal.
+ * This function handles the HTTP request and response for adding a meal.
+ * It extracts the meal details from the request body and uses the `saveMeal` service to save the meal.
+ * 
+ * @param {Object} req - The HTTP request object, containing the meal details in the body.
+ * @param {Object} res - The HTTP response object used to confirm the addition or return an error message.
+ */
 const saveMealController = async (req, res) => {
     const errors = validationResult(req);
 
@@ -34,9 +59,18 @@ const saveMealController = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+/**
+ * Controller for updating a meal.
+ * This function handles the HTTP request and response for updating a meal's details.
+ * It extracts the mealID and updated details from the request body and uses the `modifyMeal` service to update the meal.
+ * 
+ * @param {Object} req - The HTTP request object, containing the mealID and updated details in the body.
+ * @param {Object} res - The HTTP response object used to confirm the update or return an error message.
+ */
 const modifyMealController = async (req, res) => {
     const errors = validationResult(req);
-    
+
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
@@ -48,6 +82,15 @@ const modifyMealController = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+/**
+ * Controller for deleting a meal.
+ * This function handles the HTTP request and response for deleting a meal by its ID.
+ * It extracts the mealID from the request parameters and uses the `deleteMeal` service to delete the meal.
+ * 
+ * @param {Object} req - The HTTP request object, containing the mealID in the params.
+ * @param {Object} res - The HTTP response object used to confirm the deletion or return an error message.
+ */
 const deleteMealController = async (req, res) => {
     const mealID = req.body.mealID;
     try {

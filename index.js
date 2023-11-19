@@ -1,18 +1,21 @@
+// Importing required modules
 const express = require('express');
-const http = require('http');
-const socketModule = require('./socket');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 
+// Setting up the server port from environment variables
 const port = process.env.APP_PORT;
 const app = express();
 
+// Middleware for parsing request bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// Enabling CORS for all origins
 app.use(cors({ origin: '*' }));
 
+// Importing route modules
 const userRoute = require('./routes/user.route');
 const friendRoute = require('./routes/friend.route');
 const mealRoute = require('./routes/meal.route');
@@ -26,10 +29,12 @@ const notificationRoute = require('./routes/notification.route');
 const dailyLogsRoute = require('./routes/dailyLogs.route');
 const mealCategoriesRoute = require('./routes/mealCategories.route');
 
+// Route for the index page
 app.get("/", (req, res) => {
     res.status(200).json({ message: "this is the index page" })
 });
 
+// Registering API routes
 app.use('/api/users', userRoute);
 app.use('/api/friends', friendRoute);
 app.use('/api/meals', mealRoute);
@@ -43,20 +48,7 @@ app.use('/api/notifications', notificationRoute);
 app.use('/api/dailylogs', dailyLogsRoute);
 app.use('/api/meal/categories', mealCategoriesRoute);
 
-const server = http.createServer(app);
-socketModule.init(server);
-const io = socketModule.getIO();
-
-io.on('connection', (socket) => {
-    console.log('A user connected to WebSocket');
-
-    socket.on('disconnect', () => {
-        console.log('A user disconnected from WebSocket');
-    });
-
-
-});
-
-server.listen(port, () => {
+// Starting the server
+app.listen(port, () => {
     console.log(`app is listening at port ${port}`);
 });

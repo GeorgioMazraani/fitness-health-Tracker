@@ -1,8 +1,12 @@
 const { query } = require('../database/db');
 const { addNotification } = require('../services/notificationService');
 const moment = require('moment');
-const socket = require('../socket');
 
+/**
+ * Retrieves all achievements for a given user.
+ * @param {number} userID - The user's unique identifier.
+ * @returns {Promise<Object[]>} A promise that resolves to an array of achievement objects.
+ */
 const getAchievements = async (userID) => {
     try {
         let sql = "SELECT * FROM achievements WHERE userID=?";
@@ -13,6 +17,11 @@ const getAchievements = async (userID) => {
     }
 };
 
+/**
+ * Adds a new achievement for a user and notifies them.
+ * @param {Object} achievement - The achievement object containing userID, badgeName, and dateEarned.
+ * @returns {Promise<Object>} A promise that resolves to the newly added achievement object.
+ */
 const addAchievement = async (achievement) => {
     try {
         let insertSql = `
@@ -31,11 +40,6 @@ const addAchievement = async (achievement) => {
             dateCreated: new Date()
         });
 
-        const io = socket.getIO();
-        io.to(`user_${achievement.userID}`).emit('new_notification', {
-            content: notificationContent
-        });
-
         let insertedAchievement = await query("SELECT * FROM achievements WHERE userID=? ORDER BY achievementID DESC LIMIT 1", [achievement.userID]);
         return insertedAchievement;
     } catch (error) {
@@ -43,6 +47,11 @@ const addAchievement = async (achievement) => {
     }
 };
 
+/**
+ * Checks for a new badge based on the count of workouts completed by the user.
+ * @param {number} userID - The user's unique identifier.
+ * @returns {Promise<string|null>} A promise that resolves to the name of the new badge earned, or null if no new badge is earned.
+ */
 const checkForNewBadge = async (userID) => {
     try {
         let countSql = "SELECT COUNT(*) as workoutCount FROM workouts WHERE userID=?";

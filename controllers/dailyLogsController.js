@@ -6,9 +6,17 @@ const {
 } = require('../services/dailyLogsService');
 const { validationResult } = require('express-validator');
 
+/**
+ * Controller for retrieving all daily logs of a user.
+ * This function handles the HTTP request and response for getting all daily logs associated with a user.
+ * It extracts the userID from the request body and uses the `getDailyLogs` service to retrieve the logs.
+ * 
+ * @param {Object} req - The HTTP request object, containing the userID in the body.
+ * @param {Object} res - The HTTP response object used to return the logs or an error message.
+ */
 const getDailyLogsController = async (req, res) => {
   try {
-    const { userID } = req.body; // Assuming userID is passed as a URL parameter
+    const { userID } = req.body; 
     const logs = await getDailyLogs(userID);
     res.json({ dailyLogs: logs });
   } catch (error) {
@@ -16,9 +24,17 @@ const getDailyLogsController = async (req, res) => {
   }
 };
 
+/**
+ * Controller for retrieving a specific daily log.
+ * This function handles the HTTP request and response for getting a specific daily log by its ID.
+ * It extracts the logID from the request body and uses the `getDailyLog` service to retrieve the log.
+ * 
+ * @param {Object} req - The HTTP request object, containing the logID in the body.
+ * @param {Object} res - The HTTP response object used to return the log or an error message.
+ */
 const getDailyLogController = async (req, res) => {
   try {
-    const { logID } = req.body; // Assuming logID is passed as a URL parameter
+    const { logID } = req.body; 
     const log = await getDailyLog(logID);
     res.json({ dailyLog: log });
   } catch (error) {

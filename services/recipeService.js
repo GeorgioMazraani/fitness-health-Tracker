@@ -1,5 +1,10 @@
 const { query } = require('../database/db');
 
+/**
+ * Retrieves all recipes for a given category.
+ * @param {number} categoryID - The unique identifier of the meal category.
+ * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
+ */
 const getRecipes = async (categoryID) => {
     try {
         let sql = "SELECT * FROM recipes where categoryID=?";
@@ -8,7 +13,13 @@ const getRecipes = async (categoryID) => {
     } catch (error) {
         throw new Error(error);
     }
-}
+};
+
+/**
+ * Retrieves a specific recipe by its ID.
+ * @param {number} recipeID - The unique identifier of the recipe.
+ * @returns {Promise<Object>} A promise that resolves to a recipe object.
+ */
 const getRecipe = async (recipeID) => {
     try {
         let sql = "SELECT * from recipes where recipeID=?";
@@ -17,7 +28,13 @@ const getRecipe = async (recipeID) => {
     } catch (error) {
         throw new Error(error);
     }
-}
+};
+
+/**
+ * Inserts a new recipe into the database.
+ * @param {Object} recipe - The recipe object containing categoryID, mealName, ingredients, preparation, servingSize, and caloriesPerServing.
+ * @returns {Promise<Object>} A promise that resolves to the newly inserted recipe object.
+ */
 const insertRecipe = async (recipe) => {
     try {
         let insertSql = `
@@ -39,6 +56,11 @@ const insertRecipe = async (recipe) => {
     }
 };
 
+/**
+ * Updates an existing recipe based on its ID.
+ * @param {Object} recipe - The recipe object containing recipeID, mealName, ingredients, preparation, servingSize, and caloriesPerServing.
+ * @returns {Promise<void>} A promise that resolves when the recipe is updated.
+ */
 const updateRecipe = async (recipe) => {
     try {
         let updateSql = `
@@ -57,14 +79,20 @@ const updateRecipe = async (recipe) => {
     }
 };
 
-const deleteRecipe=async(recipeID)=>{
-    recipeID=parseInt(recipeID,10);
-    try{
+/**
+ * Deletes a recipe based on its ID.
+ * @param {number} recipeID - The unique identifier of the recipe to be deleted.
+ * @returns {Promise<void>} A promise that resolves when the recipe is deleted.
+ */
+const deleteRecipe = async (recipeID) => {
+    recipeID = parseInt(recipeID, 10);
+    try {
         return await query("DELETE FROM recipes WHERE recipeID = ?", [recipeID]);
     } catch (error) {
         throw new Error(error);
     }
-}
+};
+
 module.exports = {
     getRecipes,
     getRecipe,

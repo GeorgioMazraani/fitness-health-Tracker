@@ -195,7 +195,6 @@ Welcome to the Fitness and Diet Tracker API repository! This repository contains
 - **moment**: A JavaScript date library for parsing, validating, manipulating, and formatting dates.
 - **mysql2**: A MySQL client for Node.js with focus on performance. It supports the MySQL protocol and all MySQL features.
 - **nodemon**: A utility that will monitor for any changes in your source and automatically restart your server, perfect for development.
-- **socket.io**: Enables real-time bidirectional event-based communication between web clients and servers.
 
 ## Running and Testing Application from Postman
 

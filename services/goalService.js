@@ -1,5 +1,11 @@
 const { query } = require('../database/db');
-const moment=require('moment');
+const moment = require('moment');
+
+/**
+ * Retrieves all goal entries for a given user.
+ * @param {number} userID - The user's unique identifier.
+ * @returns {Promise<Object[]>} A promise that resolves to an array of goal objects.
+ */
 const getGoals = async (userID) => {
     try {
         let sql = "SELECT * FROM goals where userID=?";
@@ -8,7 +14,13 @@ const getGoals = async (userID) => {
     } catch (error) {
         throw new Error(error);
     }
-}
+};
+
+/**
+ * Retrieves a specific goal by its ID.
+ * @param {number} goalID - The unique identifier of the goal.
+ * @returns {Promise<Object>} A promise that resolves to a goal object.
+ */
 const getGoal = async (goalID) => {
     try {
         let sql = "SELECT * from goals where goalID=?";
@@ -17,7 +29,13 @@ const getGoal = async (goalID) => {
     } catch (error) {
         throw new Error(error);
     }
-}
+};
+
+/**
+ * Inserts a new goal entry for a user.
+ * @param {Object} goal - The goal object containing userID, startDate, endDate, initialWeight, targetWeight, and progress.
+ * @returns {Promise<Object>} A promise that resolves to the newly inserted goal object.
+ */
 const insertGoal = async (goal) => {
     try {
         let insertSql = `
@@ -39,6 +57,11 @@ const insertGoal = async (goal) => {
     }
 };
 
+/**
+ * Updates an existing goal entry.
+ * @param {Object} goal - The goal object containing goalID, userID, startDate, endDate, initialWeight, targetWeight, and progress.
+ * @returns {Promise<void>} A promise that resolves when the goal is updated.
+ */
 const updateGoal = async (goal) => {
     try {
         let updateSql = `
@@ -58,9 +81,14 @@ const updateGoal = async (goal) => {
     }
 };
 
-const deleteGoal=async(goalID)=>{
-    goalID=parseInt(goalID,10);
-    try{
+/**
+ * Deletes a goal entry based on the provided goalID.
+ * @param {number} goalID - The unique identifier of the goal to be deleted.
+ * @returns {Promise<void>} A promise that resolves when the goal is deleted.
+ */
+const deleteGoal = async (goalID) => {
+    goalID = parseInt(goalID, 10);
+    try {
         return await query("DELETE FROM goals WHERE goalID = ?", [goalID]);
     } catch (error) {
         throw new Error(error);
