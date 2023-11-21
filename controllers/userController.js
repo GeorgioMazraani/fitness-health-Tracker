@@ -1,4 +1,4 @@
-const { getUsers, insertUser, updateUser, deleteUser, getUser } = require(`../services/userService`);
+const { getUsers, insertUser, updateUser, deleteUser, getUser, getUserDetailsWithMostBadges } = require(`../services/userService`);
 const { validationResult } = require('express-validator');
 
 /**
@@ -114,10 +114,25 @@ const deleteUserController = async (req, res) => {
     }
 };
 
+const getUserDetailsWithMostBadgesController = async (req, res) => {
+    try {
+        const userDetails = await getUserDetailsWithMostBadges();
+        if (userDetails) {
+            res.status(200).json({ userDetails });
+        } else {
+            res.status(404).json({ message: "No user found with most badges" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error?.message });
+    }
+};
+
+
 module.exports = {
     getAllUsersController,
     getUserController,
     insertUserController,
     updateUserController,
     deleteUserController,
+    getUserDetailsWithMostBadgesController
 }

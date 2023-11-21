@@ -5,7 +5,8 @@ const {
     getUserController,
     insertUserController,
     updateUserController,
-    deleteUserController
+    deleteUserController,
+    getUserDetailsWithMostBadgesController
 } = require('../controllers/userController');
 const { insertUserValidation, updateUserValidation } = require('../validations/user-validator');
 const router = express.Router();
@@ -24,6 +25,8 @@ router.put('/user', updateUserValidation, updateUserController);
 
 // Route to delete a user
 router.delete('/user', deleteUserController);
+
+router.get('/userBadges', getUserDetailsWithMostBadgesController);
 
 // Exporting the router
 module.exports = router;

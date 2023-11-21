@@ -1,4 +1,5 @@
 const { query } = require('../database/db');
+const {getUserWithMostBadges} =require('./achievementService');
 
 /**
  * Retrieves all users.
@@ -110,10 +111,29 @@ const deleteUser = async (userID) => {
 
 };
 
+const getUserDetailsWithMostBadges = async () => {
+    try {
+        const userWithMostBadges = await getUserWithMostBadges();
+        if (userWithMostBadges) {
+            const userID = userWithMostBadges.userID;
+            let userDetailsSql = "SELECT * FROM users WHERE userID=?";
+            const userDetails = await query(userDetailsSql, [userID]);
+
+            if (userDetails.length > 0) {
+                return userDetails[0]; 
+            }
+        }
+        return null; 
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
 module.exports = {
     getUsers,
     getUser,
     insertUser,
     updateUser,
     deleteUser,
+    getUserDetailsWithMostBadges
 }

@@ -81,9 +81,35 @@ const checkForNewBadge = async (userID) => {
         throw new Error(error);
     }
 };
+const getBadgesByUserID=async (userID)=>{
+    let max=0;
+    let countSql="SELECT COUNT(*) as badgesCount FROM achievements WHERE userID=?";
+    let result= await query(countSql, [userID]);
+    
+};
+
+const getUserWithMostBadges = async () => {
+    try {
+        let sql = `
+            SELECT userID, COUNT(*) as badgeCount 
+            FROM achievements 
+            GROUP BY userID 
+            ORDER BY badgeCount DESC 
+            LIMIT 1`;
+
+        const result = await query(sql);
+        if (result.length > 0) {
+            return result[0];
+        }
+        return null;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
 
 module.exports = {
     getAchievements,
     addAchievement,
-    checkForNewBadge
+    checkForNewBadge,
+    getUserWithMostBadges
 };
