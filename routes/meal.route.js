@@ -5,13 +5,18 @@ const {
     getMealController,
     saveMealController,
     modifyMealController,
-    deleteMealController
+    deleteMealController,
+    resetMealsController,
+    searchMealController
 } = require('../controllers/mealController');
 const { validateMeal, validateMealModification } = require('../validations/meal-validator');
 const router = express.Router();
 
 // Route to get all meals
-router.get('/meals', getMealsController);
+router.get('/meals/:userID', getMealsController);
+
+router.get('/search-meal', searchMealController);
+
 
 // Route to get a specific meal
 router.get('/meal', getMealController);
@@ -24,6 +29,10 @@ router.put('/meal', validateMealModification, modifyMealController);
 
 // Route to delete a meal
 router.delete('/meal', deleteMealController);
+
+
+router.post('/reset-meals', resetMealsController);
+
 
 // Exporting the router
 module.exports = router;

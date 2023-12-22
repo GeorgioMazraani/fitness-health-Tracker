@@ -17,6 +17,7 @@ const getAllFriendsController = async (req, res) => {
     const { userID } = req.body;
 
     try {
+    
         const friendUserIDs = await getFriends(userID);
         res.status(200).json({ friends: friendUserIDs });
     } catch (error) {
@@ -80,12 +81,11 @@ const getPendingFriendsController = async (req, res) => {
  */
 
 const addFriendController = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+ 
     const { userID1, userID2 } = req.body;
+    
     try {
+        console.log(userID1, userID2);
         const result = await addFriend(userID1, userID2);
         res.status(200).json({ result });
     } catch (error) {
@@ -124,10 +124,6 @@ const acceptFriendController = async (req, res) => {
  * @param {Object} res - The response object.
  */
 const removeFriendController = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
     try {
         const { userID1, userID2 } = req.body;
         const result = await removeFriend(userID1, userID2);

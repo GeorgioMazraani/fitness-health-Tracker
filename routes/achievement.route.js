@@ -4,7 +4,7 @@ const { getAchievementsController, addAchievementController } = require('../cont
 const router = express.Router();
 
 // Route to get achievements for a user
-router.get('/achievements', getAchievementsController);
+router.get('/achievements/:userID', getAchievementsController);
 
 // Route to add a new achievement
 router.post('/achievement', addAchievementController);

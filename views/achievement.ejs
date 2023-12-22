@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Achievements</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 0;
+            list-style: none;
+        }
+
+        .badge-item {
+            text-align: center;
+            padding: 10px;
+            background-color: #e7e7e7;
+            border-radius: 8px;
+        }
+
+        .badge-icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .badge-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .badge-description {
+            font-size: 0.9em;
+        }
+
+        .go-back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>User Achievements</h1>
+            <p>Unlock your potential with every milestone you achieve!</p>
+        </div>
+        <ul class="badge-grid">
+            <% achievements.forEach(function(achievement) { %>
+                <li class="badge-item">
+                    <img src="<%= achievement.icon %>" alt="<%= achievement.badgeName %>" class="badge-icon">
+                    <h2 class="badge-title">
+                        <%= achievement.badgeName %>
+                    </h2>
+                    <p class="badge-description">
+                        <%= achievement.description %>
+                    </p>
+                </li>
+                <% }); %>
+        </ul>
+
+        <div class="go-back-button">
+            <a href="/dashboard" class="button">Go Back</a>
+        </div>
+    </div>
+</body>
+
+</html>

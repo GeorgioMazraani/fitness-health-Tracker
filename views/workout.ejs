@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Workout Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 1em;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        #workout-form {
+            margin-bottom: 20px;
+        }
+
+        #workout-form form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #workout-form input[type="text"],
+        #workout-form input[type="date"],
+        #workout-form input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #workout-form button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #5cb85c;
+            color: white;
+            cursor: pointer;
+        }
+
+        #workout-form button:hover {
+            background-color: #4cae4c;
+        }
+
+        .cancel-button {
+            background-color: darkgrey;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            display: inline-block;
+
+            font-size: 16px;
+
+            margin: 4px 2px;
+
+            cursor: pointer;
+
+            border-radius: 5px;
+
+
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav>
+    </nav>
+
+    <main>
+        <section id="workout-form">
+
+            <form id="new-workout-form" action="/userWorkout" method="POST">
+                <input type="hidden" name="userID" value="<%= userID %>" />
+                <input type="text" name="workoutName" placeholder="Workout Name" required>
+                <input type="date" name="workoutDate" required>
+                <input type="number" name="duration" placeholder="Duration (in minutes)" required>
+                <input type="number" name="caloriesBurned" placeholder="Calories Burned" required>
+                <button type="submit">Add Workout</button>
+                <button type="button" class="cancel-button" onclick="window.location='/dashboard';">Cancel</button>
+            </form>
+
+        </section>
+
+        <section id="workout-list">
+
+        </section>
+
+        <section id="achievements">
+
+        </section>
+    </main>
+
+</body>
+
+</html>

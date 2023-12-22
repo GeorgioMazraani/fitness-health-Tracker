@@ -1,5 +1,30 @@
 const { query } = require('../database/db');
 const {getUserWithMostBadges} =require('./achievementService');
+const bcrypt = require('bcrypt');
+
+const loginUser = async (email, password) => {
+    try {
+        let sql = `SELECT * FROM users WHERE email = ?`;
+        const users = await query(sql, [email]);
+
+        if (users.length === 0) {
+            throw new Error('User not found.');
+        }
+
+        const user = users[0];
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            throw new Error('Invalid credentials.');
+        }
+
+        return user; 
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 
 /**
  * Retrieves all users.
@@ -22,9 +47,21 @@ const getUsers = async () => {
  */
 const getUser = async (userID) => {
     try {
-        let sql = `select * from users where userID=?`;
-        const user = await query(sql, [userID]);
-        return user;
+        let sql = `SELECT * FROM users WHERE userID = ?`;
+        const users = await query(sql, [userID]);
+        return users[0]; 
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+
+const searchUsersByUsername = async (searchTerm) => {
+    try {
+        let sql = "SELECT userID, username FROM users WHERE username LIKE ?";
+      
+        const users = await query(sql, [`%${searchTerm}%`]);
+        return users;
     } catch (error) {
         throw new Error(error);
     }
@@ -35,15 +72,21 @@ const getUser = async (userID) => {
  * @param {String} Username, Password, Email, Age, Weight, Height, Gender, Goal - The user's details.
  * @returns {Promise<Object>} A promise that resolves to the newly inserted user object.
  */
+
+const saltRounds = 10; 
+
 const insertUser = async (Username, Password, Email, Age, Weight, Height, Gender, Goal) => {
     try {
+        
+        const hashedPassword = await bcrypt.hash(Password, saltRounds);
+
         let insertSql = `
             INSERT INTO users (username, password, email, age, weight, height, gender, goal) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
         await query(insertSql, [
             Username,
-            Password,
+            hashedPassword, 
             Email,
             Age,
             Weight,
@@ -53,12 +96,15 @@ const insertUser = async (Username, Password, Email, Age, Weight, Height, Gender
         ]);
 
         // Retrieve the last inserted user
-        let insertedUser = await query("SELECT * FROM users ORDER BY userID DESC LIMIT 1");
-        return insertedUser;
+        // let insertedUser = await query("SELECT * FROM users ORDER BY userID DESC LIMIT 1");
+        // return insertedUser;
+        let insertedUser = await query("SELECT LAST_INSERT_ID() as id"); 
+        return insertedUser[0].id; 
     } catch (error) {
         throw new Error(error);
     }
 };
+
 
 /**
  * Updates an existing user's details.
@@ -66,34 +112,30 @@ const insertUser = async (Username, Password, Email, Age, Weight, Height, Gender
  * @param {String} Username, Password, Email, Age, Weight, Height, gender, goal - The new details for the user.
  * @returns {Promise<void>} A promise that resolves when the user is updated.
  */
-const updateUser = async (userID, Username, Password, Email, Age, Weight, Height, gender, goal) => {
+const updateUser = async (userID, updateParams) => {
     try {
-        let updateSql = `
-            UPDATE users 
-            SET 
-                username = ?,
-                password = ?,
-                email = ?,
-                age = ?,
-                weight = ?,
-                height = ?,
-                gender = ?,
-                goal = ?
-            WHERE userID = ?`;
+        let updateSql = 'UPDATE users SET ';
+        let queryParams = [];
 
-        await query(updateSql, [
-            Username, // First set the Username
-            Password, // Then Password
-            Email,    // And so on...
-            Age,
-            Weight,
-            Height,
-            gender,
-            goal,
-            userID    // userID should be last to match the WHERE clause
-        ]);
+        for (const [key, value] of Object.entries(updateParams)) {
+            if (value !== undefined) {
+                updateSql += `${key} = ?, `;
+                queryParams.push(value);
+            }
+        }
+
+        if (queryParams.length > 0) {
+            updateSql = updateSql.slice(0, -2);
+            updateSql += ` WHERE userID = ?`;
+            queryParams.push(userID);
+
+            await query(updateSql, queryParams);
+        } else {
+            throw new Error('No update fields provided');
+        }
     } catch (error) {
-        throw new Error(error);
+        console.error('Error in updateUser:', error);
+        throw new Error(error.message);
     }
 };
 
@@ -135,5 +177,7 @@ module.exports = {
     insertUser,
     updateUser,
     deleteUser,
-    getUserDetailsWithMostBadges
+    getUserDetailsWithMostBadges,
+    loginUser,
+    searchUsersByUsername
 }

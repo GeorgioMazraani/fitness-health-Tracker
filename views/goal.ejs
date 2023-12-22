@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Goals</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        form input, form button {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+        .goals-list {
+            list-style: none;
+            padding: 0;
+        }
+        .goal-item {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Goals</h1>
+        <% if(goals && goals.length > 0) { %>
+            <ul>
+                <% goals.forEach(function(goal) { %>
+                    <li>
+                 
+                        <p>Start Date: <%= goal.startDate %></p>
+                        <p>End Date: <%= goal.endDate %></p>
+                        <p>Initial Weight: <%= goal.initialWeight %></p>
+                        <p>Target Weight: <%= goal.targetWeight %></p>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } else { %>
+            <p>No goals found.</p>
+        <% } %>
+    </div>
+</body>
+</html>

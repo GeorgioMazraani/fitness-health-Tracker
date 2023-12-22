@@ -1,4 +1,4 @@
-const { getRecipes, getRecipe, insertRecipe, updateRecipe, deleteRecipe } = require('../services/recipeService');
+const { getRecipes, getRecipe, insertRecipe, updateRecipe, deleteRecipe,fetchRecipeData } = require('../services/recipeService');
 const { validationResult } = require('express-validator');
 
 /**
@@ -10,14 +10,20 @@ const { validationResult } = require('express-validator');
  * @param {Object} res - The response object.
  */
 const getRecipesController = async (req, res) => {
-    const { categoryID } = req.body;
+    // Assuming you're using mealName as a query parameter
+    const mealName = req.query.mealName;
     try {
-        const recipeByCatID = await getRecipes(categoryID);
-        res.status(200).json({ recipes: recipeByCatID });
+        // getRecipes should be a function that fetches recipes based on the meal name or category
+        const recipes = await getRecipes(mealName);
+
+        // Render the 'recipes.ejs' template and pass the recipes data to it
+        res.render('recipes', { recipes });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        // Render an error page or pass the error to a global error handler
+        res.status(500).render('error', { message: error.message });
     }
 };
+
 
 /**
  * Controller to retrieve a specific recipe by its ID.
@@ -100,12 +106,25 @@ const deleteRecipeController = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+const fetchRecipesController = async (req, res) => {
+    const mealName = req.query.mealName;
+
+    try {
+        const recipes = await fetchRecipeData(mealName);
+        res.json({ recipes });
+    } catch (error) {
+        console.error('Error in fetchRecipesController:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 module.exports = {
     getRecipesController,
     getRecipeController,
     insertRecipeController,
     updateRecipeController,
-    deleteRecipeController
+    deleteRecipeController,
+    fetchRecipesController
 };
 

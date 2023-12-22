@@ -1,19 +1,46 @@
 const { query } = require('../database/db');
-
+const axios = require('axios');
 /**
  * Retrieves all recipes for a given category.
  * @param {number} categoryID - The unique identifier of the meal category.
  * @returns {Promise<Object[]>} A promise that resolves to an array of recipe objects.
  */
-const getRecipes = async (categoryID) => {
+const getRecipes = async (mealName) => {
     try {
-        let sql = "SELECT * FROM recipes where categoryID=?";
-        const recipes = await query(sql, [categoryID]);
+        let sql = "SELECT * FROM recipes where mealName=?";
+        const recipes = await query(sql, [mealName]);
         return recipes;
     } catch (error) {
         throw new Error(error);
     }
 };
+const fetchRecipeData = async (mealName) => {
+    try {
+        console.log(`Fetching recipes for meal name: ${mealName}`); // Log the meal name
+        const response = await axios.get(`https://api.calorieninjas.com/v1/recipe?query=${encodeURIComponent(mealName)}`, {
+            headers: { 'X-Api-Key': 'uUN/Ixvc6cp5AniijyAgwA==vMOx9Xy8p2DTXZjd' } 
+        });
+        return response.data.items; 
+    } catch (error) {
+        console.error('Error in fetchRecipeData:', error);
+        // Log more error details or handle specific error scenarios
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            console.error('Response data:', error.response.data);
+            console.error('Response status:', error.response.status);
+            console.error('Response headers:', error.response.headers);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received:', error.request);
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Error', error.message);
+        }
+        throw new Error(error.response ? error.response.data.error : error.message);
+    }
+};
+
+
 
 /**
  * Retrieves a specific recipe by its ID.
@@ -38,7 +65,7 @@ const getRecipe = async (recipeID) => {
 const insertRecipe = async (recipe) => {
     try {
         let insertSql = `
-            INSERT INTO recipes (categoryID, mealName, ingredients, preparation, servingSize, caloriesPerServing) 
+            INSERT INTO recipes (categoryID, mealName, ingredients, preparation, servingSize) 
             VALUES (?, ?, ?, ?, ?, ?)`;
         await query(insertSql, [
             recipe.categoryID,
@@ -46,7 +73,7 @@ const insertRecipe = async (recipe) => {
             recipe.ingredients,
             recipe.preparation,
             recipe.servingSize,
-            recipe.caloriesPerServing
+
         ]);
         let insertedRecipe = await query("SELECT * FROM recipes ORDER BY recipeID DESC LIMIT 1 ");
 
@@ -64,14 +91,13 @@ const insertRecipe = async (recipe) => {
 const updateRecipe = async (recipe) => {
     try {
         let updateSql = `
-            UPDATE recipes SET mealName = ?, ingredients = ?, preparation = ?, servingSize = ?, caloriesPerServing = ?
+            UPDATE recipes SET mealName = ?, ingredients = ?, preparation = ?, servingSize = ?
              WHERE recipeID = ?`;
         await query(updateSql, [
             recipe.mealName,
             recipe.ingredients,
             recipe.preparation,
             recipe.servingSize,
-            recipe.caloriesPerServing,
             recipe.recipeID
         ]);
     } catch (error) {
@@ -98,5 +124,6 @@ module.exports = {
     getRecipe,
     insertRecipe,
     updateRecipe,
-    deleteRecipe
+    deleteRecipe,
+    fetchRecipeData
 }

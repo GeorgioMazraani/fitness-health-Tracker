@@ -9,12 +9,14 @@ const { getAchievements, addAchievement } = require('../services/achievementServ
  * @param {Object} res - The HTTP response object used to return the data or an error message.
  */
 const getAchievementsController = async (req, res) => {
-    const { userID } = req.body;
+    const userID = req.params.userID; 
     try {
-        const userAchievements = await getAchievements(userID);
-        res.status(200).json({ achievements: userAchievements });
+        const achievements = await getAchievements(userID);
+        
+        // Render the achievements view and pass the achievements data
+        res.render('achievement', { achievements: achievements });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).send('Error occurred: ' + error.message);
     }
 };
 

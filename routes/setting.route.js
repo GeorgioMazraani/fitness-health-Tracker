@@ -5,7 +5,8 @@ const { saveSettingsValidation } = require('../validations/setting-validator');
 const router = express.Router();
 
 // Route to get settings for a user
-router.get('/settings', getSettingsController);
+router.get('/settings/:userID', getSettingsController);
+
 
 // Route to save or update settings
 router.post('/settings', saveSettingsValidation, saveSettingsController);

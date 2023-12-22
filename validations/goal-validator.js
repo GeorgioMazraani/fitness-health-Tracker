@@ -27,9 +27,7 @@ const validateGoal = [
         .notEmpty().withMessage('Target weight is required')
         .isFloat({ min: 0 }).withMessage('Target weight must be a positive number'),
 
-    body('progress')
-        .notEmpty().withMessage('Progress is required')
-        .isFloat({ min: 0, max: 100 }).withMessage('Progress must be a number between 0 and 100'),
+
 ];
 
 const validateGoalUpdate = [
@@ -62,9 +60,7 @@ const validateGoalUpdate = [
         .notEmpty().withMessage('Target weight is required')
         .isFloat({ min: 0 }).withMessage('Target weight must be a positive number'),
 
-    body('progress')
-        .notEmpty().withMessage('Progress is required')
-        .isFloat({ min: 0, max: 100 }).withMessage('Progress must be a number between 0 and 100'),
+
 ];
 
 module.exports = {

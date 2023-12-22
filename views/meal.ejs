@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        .meal-section {
+            margin-bottom: 30px;
+        }
+
+        .meal-item {
+            background-color: #e7e7e7;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .meal-item p {
+            margin: 0;
+        }
+
+        button,
+        input[type='submit'] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover,
+        input[type='submit']:hover {
+            background-color: #0056b3;
+        }
+
+        .meal-form {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            margin-bottom: 20px;
+        }
+
+        .meal-form label,
+        .meal-form select,
+        .meal-form input,
+        .meal-form button {
+            margin-bottom: 10px;
+        }
+
+        .meal-form label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Daily Meal Planner</h1>
+        <div class="meal-section">
+            <form id="meal-form" class="meal-form">
+                <input type="hidden" id="user-id" name="userID" value="<%= userID %>">
+                <label for="meal-category">Choose a meal category:</label>
+                <select id="meal-category" name="categoryID">
+                    <option value="1">Breakfast</option>
+                    <option value="2">Lunch</option>
+                    <option value="3">Dinner</option>
+                    <option value="4">Snacks</option>
+                </select>
+                <input type="text" id="meal-search" placeholder="Search for a meal" name="mealName">
+                <button type="button" onclick="searchMeal()">Search</button>
+                <button type="button" onclick="saveMeal()">Save Meal</button>
+            </form>
+            <div id="meal-info" style="display: none;">
+                <p>Name: <span id="meal-name"></span></p>
+                <p>Calories: <span id="meal-calories"></span></p>
+                <p>Proteins: <span id="meal-proteins"></span> g</p>
+                <p>Carbs: <span id="meal-carbs"></span> g</p>
+                <p>Fats: <span id="meal-fats"></span> g</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getQueryParam(param) {
+            var urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        function searchMeal() {
+            var searchQuery = document.getElementById('meal-search').value;
+            if (!searchQuery) {
+                alert('Please enter a meal name to search.');
+                return;
+            }
+
+         
+            fetch(`/search-meal?mealName=${encodeURIComponent(searchQuery)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                  
+                    if (data && data.items && data.items.length > 0) {
+                        const meal = data.items[0];
+                        document.getElementById('meal-name').textContent = meal.name;
+                        document.getElementById('meal-calories').textContent = meal.calories;
+                        document.getElementById('meal-proteins').textContent = meal.protein_g;
+                        document.getElementById('meal-carbs').textContent = meal.carbohydrates_total_g;
+                        document.getElementById('meal-fats').textContent = meal.fat_total_g;
+
+                        // Make sure to display the meal-info div
+                        document.getElementById('meal-info').style.display = 'block';
+                    } else {
+                        alert('No meal data found for your search.');
+                    }
+                })
+                .then(data => {
+                   
+                    const viewRecipeBtn = document.createElement('button');
+                    viewRecipeBtn.innerText = 'View Recipe';
+                    viewRecipeBtn.onclick = function () {
+                        window.location.href = '/recipes?mealName=' + encodeURIComponent(searchQuery);
+                    };
+                    document.getElementById('meal-info').appendChild(viewRecipeBtn);
+                })
+
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error fetching meal data.');
+                });
+
+        }
+
+        function saveMeal() {
+            var userID = document.getElementById('user-id').value;
+            if (!userID) {
+                alert('User ID is missing.');
+                return;
+            }
+
+            var categoryID = document.getElementById('meal-category').value;
+            var mealName = document.getElementById('meal-search').value;
+
+            var mealDate = new Date().toISOString().slice(0, 10);
+
+           
+            var calories = document.getElementById('meal-calories').textContent;
+            var proteins = document.getElementById('meal-proteins').textContent;
+            var carbs = document.getElementById('meal-carbs').textContent;
+            var fats = document.getElementById('meal-fats').textContent;
+
+            var mealData = {
+                userID: userID,
+                categoryID: categoryID,
+                mealName: mealName,
+                mealDate: mealDate,
+                calories: parseFloat(calories),
+                proteins: parseFloat(proteins),
+                carbs: parseFloat(carbs),
+                fats: parseFloat(fats)
+            };
+
+            fetch('/meal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mealData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                 
+                    alert('Meal saved successfully.');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error saving meal data: ' + error.message);
+                });
+        }
+
+    </script>
+</body>
+
+</html>

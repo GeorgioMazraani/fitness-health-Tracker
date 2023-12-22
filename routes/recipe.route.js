@@ -5,7 +5,8 @@ const {
     getRecipeController,
     insertRecipeController,
     updateRecipeController,
-    deleteRecipeController
+    deleteRecipeController,
+    fetchRecipesController
 } = require('../controllers/recipeController');
 const { validateRecipeInsert, validateRecipeUpdate } = require('../validations/recipe-validator');
 const router = express.Router();
@@ -24,6 +25,7 @@ router.put('/recipe', validateRecipeUpdate, updateRecipeController);
 
 // Route to delete a recipe
 router.delete('/recipe', deleteRecipeController);
+router.get('/fetch-recipes', fetchRecipesController);
 
 // Exporting the router
 module.exports = router;

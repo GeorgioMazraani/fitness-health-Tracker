@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Fitness and Diet Tracker</title>
+  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            background: url('/image1.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 250px;
+        }
+
+        .nav-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: block;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar navbar-expand navbar-light bg-light w-100">
+        <a class="navbar-brand" href="#">Dashboard</a>
+        <div class="ml-auto">
+
+            <form action="/search" method="get">
+                <input type="text" name="username" placeholder="Search Users">
+                <button type="submit">Search</button>
+            </form>
+
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+       
+        <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 250px; height: 100vh;">
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="/settings/<%= user.userID %>" class="nav-link">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/updateProfile/<%= user.userID %>" class="nav-link">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/meals/<%= user.userID %>" class="nav-link">Meals</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/workouts/<%= user.userID %>" class="nav-link">Workouts</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/goals/<%= user.userID %>" class="nav-link">Goals</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/achievements/<%= user.userID %>" class="nav-link">Achievements</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/dailylogs/<%= user.userID %>" class="nav-link">Daily Logs</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/feedback/<%= user.userID %>" class="nav-link">Feedback</a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" onclick="logoutUser()" class="nav-link">Logout</a>
+                </li>
+
+
+            </ul>
+        </div>
+
+        <div class="content-area">
+       
+            <h1>Welcome to Your Dashboard</h1>
+   
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        function logoutUser() {
+           
+            fetch('/logout', {
+                method: 'POST', 
+            })
+                .then(response => {
+                    if (response.ok) {
+                       
+                        window.location.href = '/login'; 
+                    } else {
+                        alert('Logout failed.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+    </script>
+
+</body>
+
+</html>

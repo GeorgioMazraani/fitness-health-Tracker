@@ -10,12 +10,14 @@ const { validationResult } = require('express-validator');
  * @param {Object} res - The response object.
  */
 const getFeedbackController = async (req, res) => {
-    const { userID } = req.body;
+    const { userID } = req.params;  // Assuming you're getting userID from route parameters
     try {
         const feedback = await getFeedback(userID);
-        res.status(200).json({ feedback });
+
+        // Render the feedback.ejs view and pass the feedback data to it
+        res.render('feedback', { feedback: feedback, userID: userID });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).send('Error occurred: ' + error.message);
     }
 };
 
@@ -33,14 +35,25 @@ const submitFeedbackController = async (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const userfeedback = req.body;
+
+    const { userID, content } = req.body;
+    const dateSubmitted = new Date().toISOString().split('T')[0]; 
+
     try {
-        const insertedFeedback = await submitFeedback(userfeedback);
-        res.status(200).json({ insertedFeedback });
+        const feedbackData = {
+            userID: userID,
+            content: content,
+            dateSubmitted: dateSubmitted
+        };
+
+        const insertedFeedback = await submitFeedback(feedbackData);
+        res.redirect('/dashboard');
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+
 
 /**
  * Controller to delete user feedback.
@@ -58,8 +71,8 @@ const deleteFeedbackController = async (req, res) => {
     }
     const { feedbackID } = req.body;
     try {
-        const deletedFeedback = await deleteFeedback(feedbackID);
-        res.status(200).json({ deletedFeedback });
+        await deleteFeedback(feedbackID);
+        res.redirect('feedback');
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

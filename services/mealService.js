@@ -1,5 +1,6 @@
 const { query } = require('../database/db');
 const moment = require('moment');
+const axios = require('axios');
 
 /**
  * Retrieves all meal entries for a given user.
@@ -59,6 +60,17 @@ const saveMeal = async (meal) => {
     }
 };
 
+const fetchNutritionData = async (mealName) => {
+    try {
+        const response = await axios.get(`https://api.calorieninjas.com/v1/nutrition?query=${mealName}`, {
+            headers: { 'X-Api-Key': 'uUN/Ixvc6cp5AniijyAgwA==vMOx9Xy8p2DTXZjd' }
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response.data.error);
+    }
+};
+
 /**
  * Modifies an existing meal entry.
  * @param {Object} meal - The meal object containing mealID, userID, categoryID, mealName, mealDate, calories, proteins, carbs, and fats.
@@ -98,6 +110,13 @@ const deleteMeal = async (mealID) => {
     }
 }
 
+const deleteMealsForUser = async (userID) => {
+    try {
+        await query("DELETE FROM meals WHERE userID = ?", [userID]);
+    } catch (error) {
+        throw new Error(error);
+    }
+};
 
 module.exports = {
     getMeals,
@@ -105,4 +124,6 @@ module.exports = {
     saveMeal,
     modifyMeal,
     deleteMeal,
+    deleteMealsForUser,
+    fetchNutritionData
 }

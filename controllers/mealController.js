@@ -1,4 +1,4 @@
-const { getMeals, getMeal, saveMeal, modifyMeal, deleteMeal } = require('../services/mealService');
+const { getMeals, getMeal,saveMeal, modifyMeal, deleteMeal, deleteMealsForUser,fetchNutritionData } = require('../services/mealService');
 const { validationResult } = require('express-validator');
 
 /**
@@ -10,14 +10,16 @@ const { validationResult } = require('express-validator');
  * @param {Object} res - The HTTP response object used to return the meals or an error message.
  */
 const getMealsController = async (req, res) => {
-    const { userID } = req.body;
+    const { userID } = req.params; 
     try {
-        const mealIDs = await getMeals(userID);
-        res.status(200).json({ meals: mealIDs });
+        const mealsData = await getMeals(userID);
+        res.render('meal', { meals: mealsData, userID: userID }); 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).render('error', { message: error.message });
     }
 };
+
+
 
 /**
  * Controller for retrieving a specific meal.
@@ -51,13 +53,22 @@ const saveMealController = async (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const meal = req.body; // assuming meal contains all required fields
     try {
-        const savedMeal = await saveMeal(meal);
-        res.status(201).json({ meal: savedMeal });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+       console.log(req.body);
+
+       const result = await saveMeal(req.body);
+
+       // If the insert function returns a result, use that to determine if the operation was successful
+       if (result) {
+           res.status(201).json({ message: 'Meal added successfully', data: result });
+       } else {
+           // If the result is falsy, respond with an error
+           res.status(500).json({ message: 'Failed to add the meal' });
+       }
+   } catch (error) {
+       console.error(error);
+       res.status(500).json({ message: 'Server error while adding meal', error: error.message });
+   }
 };
 
 /**
@@ -100,11 +111,44 @@ const deleteMealController = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+const resetMealsController = async (req, res) => {
+    try {
+      
+        await deleteMealsForUser(req.body.userID);
+        res.redirect('/meals'); // Redirect back to the meals page
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const deleteMealsForAllUsers = async () => {
+    try {
+        await query("DELETE FROM meals");
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+const searchMealController = async (req, res) => {
+    try {
+        const mealName = req.query.mealName;
+        const mealData = await fetchNutritionData(mealName);
+        res.json(mealData);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while fetching meal data." });
+    }
+};
+
+
+
 module.exports = {
     getMealsController,
     getMealController,
     saveMealController,
     modifyMealController,
     deleteMealController,
+    resetMealsController,
+    deleteMealsForAllUsers,
+    searchMealController
 
 }

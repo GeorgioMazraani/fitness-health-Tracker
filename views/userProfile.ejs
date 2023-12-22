@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= user.username %>'s Profile
+    </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .profile-details h3 {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .profile-details p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="profile-header">
+            <h2>
+                <%= user.username %>
+            </h2>
+        </div>
+
+        <div class="profile-details">
+            <h3>About</h3>
+            <p>Age: <%= user.age %>
+            </p>
+            <p>Gender: <%= user.gender %>
+            </p>
+            <p>Height: <%= user.height %> cm</p>
+            <p>Weight: <%= user.weight %> kg</p>
+            <p>Goal: <%= user.goal %>
+            </p>
+
+        </div>
+
+        <% if (relationshipStatus==='requested' ) { %>
+            <div id="buttonsContainer">
+                <button onclick="acceptFriend('<%= currentUserID %>', '<%= profileUserID %>');">Accept</button>
+                <button onclick="removeFriend('<%= currentUserID %>', '<%= profileUserID %>');">Delete</button>
+            </div>
+            <% } else if (relationshipStatus==='none' ) { %>
+                <div id="buttonsContainer">
+                    <button id="followButton"
+                        onclick="handleFollow('<%= currentUserID %>', '<%= profileUserID %>');">Follow</button>
+                </div>
+                <% } else if (relationshipStatus==='friends' ) { %>
+                    <p>You are friends</p>
+                    <% } %>
+
+    </div>
+    <script>
+        function handleFollow(currentUserID, profileUserID) {
+            fetch('http://localhost:3001/friends/add', {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include CSRF token if needed
+                },
+
+                body: JSON.stringify({ userID1: currentUserID, userID2: profileUserID }),
+                credentials: 'include' 
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const followButton = document.getElementById('followButton');
+                    if (data.result.status === 'requested') {
+                        followButton.innerText = 'Pending';
+                        followButton.onclick = function () {
+                            cancelFriend(currentUserID, profileUserID);
+                        };
+                        followButton.disabled = true;
+                    } else {
+                        console.error('Failed to send friend request:', data);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+        function acceptFriend(currentUserID, profileUserID) {
+          
+            fetch('http://localhost:3001/friends/accept', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                  
+                },
+                body: JSON.stringify({ userID1: currentUserID, userID2: profileUserID }),
+                credentials: 'include'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'accepted') {
+                      
+                        const buttonsContainer = document.getElementById('buttonsContainer');
+                        buttonsContainer.innerHTML = '<p>You are now friends</p>';
+                    } else {
+                        console.error('Failed to accept friend request:', data);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+        function removeFriend(currentUserID, profileUserID) {
+            fetch('http://localhost:3001/friends/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userID1: currentUserID, userID2: profileUserID }),
+                credentials: 'include' 
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const followButton = document.getElementById('followButton');
+                    if (data.status === 'removed') {
+                        followButton.innerText = 'Follow';
+                        followButton.onclick = function () {
+                            handleFollow(currentUserID, profileUserID);
+                        };
+                        followButton.disabled = false;
+                    } else {
+                        console.error('Failed to cancel friend request:', data);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+
+</body>
+
+
+</html>

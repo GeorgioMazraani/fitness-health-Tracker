@@ -25,13 +25,13 @@ router.get('/pending', validateUserId, getPendingFriendsController);
 router.post('/add', validateUserIds, addFriendController);
 
 // Route to accept a friend request
-router.put('/accept', validateUserIds, acceptFriendController);
+router.post('/accept', validateUserIds, acceptFriendController);
 
 // Route to block a user
 router.put('/block', validateUserIds, blockFriendController);
 
 // Route to remove a friend
-router.delete('/remove', validateUserIds, removeFriendController);
+router.post('/remove', validateUserIds, removeFriendController);
 
 // Exporting the router
 module.exports = router;

@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        .results-container {
+            display: flex;
+            flex-direction: column; 
+            align-items: center; 
+            height: 80vh; 
+        }
+        .user-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 10px;
+            width: 300px; 
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Search Results</h1>
+        <div class="results-container">
+            <% if(users && users.length > 0) { %>
+                <% users.forEach(function(user) { %>
+                    <div class="user-card">
+                        <h5><%= user.username %></h5>
+                        <a href="/userProfile/<%= user.userID %>" class="btn btn-primary">View Profile</a>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No users found.</p>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

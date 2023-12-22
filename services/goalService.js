@@ -39,15 +39,15 @@ const getGoal = async (goalID) => {
 const insertGoal = async (goal) => {
     try {
         let insertSql = `
-            INSERT INTO goals (userID, startDate, endDate, initialWeight, targetWeight, progress) 
-            VALUES (?, ?, ?, ?, ?, ?)`;
+            INSERT INTO goals (userID, startDate, endDate, initialWeight, targetWeight) 
+            VALUES (?, ?, ?, ?, ?)`;
         await query(insertSql, [
             goal.userID,
             moment(goal.startDate).format('YYYY-MM-DD'),
             moment(goal.endDate).format('YYYY-MM-DD'),
             goal.initialWeight,
             goal.targetWeight,
-            goal.progress
+        
         ]);
         let insertedGoal = await query("SELECT * FROM goals WHERE userID = ? ORDER BY goalID DESC LIMIT 1", [goal.userID]);
 
@@ -65,15 +65,14 @@ const insertGoal = async (goal) => {
 const updateGoal = async (goal) => {
     try {
         let updateSql = `
-            UPDATE goals SET startDate = ?, endDate = ?, initialWeight = ?, targetWeight = ?, progress = ?
+            UPDATE goals SET startDate = ?, endDate = ?, initialWeight = ?, targetWeight = ?,
              WHERE goalID = ? AND userID = ?`;
         await query(updateSql, [
             moment(goal.startDate).format('YYYY-MM-DD'),
             moment(goal.endDate).format('YYYY-MM-DD'),
             goal.initialWeight,
             goal.targetWeight,
-            goal.progress,
-            goal.goalID, // Assuming this property contains the ID of the goal to update
+            goal.goalID, 
             goal.userID
         ]);
     } catch (error) {

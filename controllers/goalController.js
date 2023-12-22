@@ -10,14 +10,36 @@ const { validationResult } = require('express-validator');
  * @param {Object} res - The response object.
  */
 const getGoalsController = async (req, res) => {
-    const { userID } = req.body;
+    const { userID } = req.params;
     try {
-        const goalsUserId = await getGoals(userID);
-        res.status(200).json({ goals: goalsUserId });
+        const goals = await getGoals(userID);
+        res.render('goal', { goals }); // Render 'goals.ejs' with goals data
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).render('error', { message: error.message });
     }
 };
+/**
+ * Controller to render the insert goal page.
+ * This function handles the HTTP request and response for displaying the goal insertion form.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+const renderInsertGoalPage = (req, res) => {
+    try {
+        const userID = req.params.userID;
+      
+
+        res.render('insertGoals', { userID }); 
+    } catch (error) {
+        res.status(500).render('error', { message: error.message });
+    }
+};
+
+
+
+
+
 
 /**
  * Controller to retrieve a specific goal by its ID.
@@ -54,7 +76,7 @@ const insertGoalController = async (req, res) => {
     const goal = req.body;
     try {
         const insertedGoal = await insertGoal(goal);
-        res.status(200).json({ insertedGoal });
+        res.redirect('/login');
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -106,6 +128,7 @@ module.exports = {
     getGoalController,
     insertGoalController,
     updateGoalController,
-    deleteGoalController
+    deleteGoalController,
+    renderInsertGoalPage
 };
 

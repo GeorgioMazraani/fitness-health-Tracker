@@ -11,13 +11,13 @@ const { validateWorkout, validateWorkoutUpdate } = require('../validations/worko
 const router = express.Router();
 
 // Route to get all workouts
-router.get('/workouts', getWorkoutsController);
+router.get('/workouts/:userID', getWorkoutsController);
 
 // Route to get a specific workout
 router.get('/workout', getWorkoutController);
 
 // Route to insert a new workout
-router.post('/workout', validateWorkout, insertWorkoutController);
+router.post('/userWorkout', validateWorkout, insertWorkoutController);
 
 // Route to update a workout
 router.put('/workout', validateWorkoutUpdate, updateWorkoutController);

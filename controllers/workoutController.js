@@ -10,14 +10,17 @@ const { validationResult } = require('express-validator');
  * @param {Object} res - The response object.
  */
 const getWorkoutsController = async (req, res) => {
-    const { userID } = req.body;
+    const userID = req.params.userID; 
+
     try {
         const workouts = await getWorkouts(userID);
-        res.status(200).json({ workouts });
+        res.render('workout', { workouts, userID }); 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.render('error', { message: error.message });
     }
 };
+
+
 
 /**
  * Controller to retrieve a specific workout by its ID.
@@ -46,20 +49,30 @@ const getWorkoutController = async (req, res) => {
  * @param {Object} req - The request object containing workout details.
  * @param {Object} res - The response object.
  */
+// In insertWorkoutController
 const insertWorkoutController = async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
+       
         return res.status(400).json({ errors: errors.array() });
     }
-    const workout = req.body;
+    const{userID}=req.body;
+    const { workoutName, workoutDate, duration, caloriesBurned } = req.body;
+
+    if (!userID || !workoutName || !workoutDate || !duration || !caloriesBurned) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
     try {
-        const newWorkout = await insertWorkout(workout);
-        res.status(200).json({ newWorkout });
+        const newWorkout = await insertWorkout(req.body);
+        res.redirect('/dashboard');
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+
 
 /**
  * Controller to update an existing workout.
@@ -94,7 +107,7 @@ const updateWorkoutController = async (req, res) => {
  * @param {Object} res - The response object.
  */
 const deleteWorkoutController = async (req, res) => {
-    const { workoutID } = req.body; // Assuming workoutID is in the body, but it could be in the params
+    const { workoutID } = req.body; 
     try {
         await deleteWorkout(workoutID);
         res.status(200).json({ message: 'Workout deleted successfully' });

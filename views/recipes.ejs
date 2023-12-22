@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipes</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .recipe-card {
+            background-color: #e7e7e7;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .recipe-card h2 {
+            color: #333;
+        }
+
+        .recipe-card p {
+            margin: 5px 0;
+        }
+
+        .recipe-ingredient, .recipe-instruction {
+            margin-left: 20px;
+            font-style: italic;
+        }
+
+        .recipe-servings {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="header">Recipe Finder</h1>
+        <div id="recipesContainer">
+        
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function getQueryParam(param) {
+                var urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            function fetchRecipesForMeal() {
+                const mealName = getQueryParam('mealName');
+                if (mealName) {
+                    fetch(`/fetch-recipes?mealName=${encodeURIComponent(mealName)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            updateRecipesOnPage(data.recipes);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error fetching recipes for ' + mealName);
+                        });
+                } else {
+                    alert("No meal name provided!");
+                }
+            }
+
+            function updateRecipesOnPage(recipes) {
+                const container = document.getElementById('recipesContainer');
+                container.innerHTML = ''; // Clear previous results
+
+                recipes.forEach(recipe => {
+                    const card = document.createElement('div');
+                    card.classList.add('recipe-card');
+
+                    const title = document.createElement('h2');
+                    title.textContent = recipe.title;
+
+                    const ingredients = document.createElement('p');
+                    ingredients.textContent = `Ingredients: ${recipe.ingredients}`;
+                    ingredients.classList.add('recipe-ingredient');
+
+                    const instructions = document.createElement('p');
+                    instructions.textContent = `Instructions: ${recipe.instructions}`;
+                    instructions.classList.add('recipe-instruction');
+
+                    const servings = document.createElement('p');
+                    servings.textContent = `Servings: ${recipe.servings}`;
+                    servings.classList.add('recipe-servings');
+
+                    card.appendChild(title);
+                    card.appendChild(ingredients);
+                    card.appendChild(instructions);
+                    card.appendChild(servings);
+
+                    container.appendChild(card);
+                });
+            }
+
+            fetchRecipesForMeal();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Logs</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .calories-summary {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .calories-summary p {
+            margin: 5px 0; 
+        }
+        .log-actions {
+            text-align: right;
+        }
+        .log-actions button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Logs</h1>
+
+        <div id="caloriesSummary" class="calories-summary">
+            <p id="consumedCalories">Total Calories Consumed: --</p>
+            <p id="burnedCalories">Total Calories Burned: --</p>
+            <p id="netCalories">Net Calories: --</p>
+            <p id="recommendation">Recommendation: --</p>
+        </div>
+
+        <button id="cancelButton" class="btn btn-secondary mb-3">Back to Dashboard</button>
+
+        <ul id="logsList">
+          
+        </ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            fetchCaloriesData();
+        });
+
+        function fetchCaloriesData() {
+          
+            const exampleData = {
+                consumed: 2000,  
+                burned: 500     
+            };
+            updateCaloriesDisplay(exampleData);
+        }
+
+        function updateCaloriesDisplay(data) {
+            // Calculate net calories
+            const netCalories = data.consumed - data.burned;
+            document.getElementById('consumedCalories').textContent = `Total Calories Consumed: ${data.consumed}`;
+            document.getElementById('burnedCalories').textContent = `Total Calories Burned: ${data.burned}`;
+            document.getElementById('netCalories').textContent = `Net Calories: ${netCalories}`;
+
+            let recommendation;
+            if (netCalories > 2000) {
+                recommendation = 'Consider eating less or exercising more.';
+            } else if (netCalories < 1500) {
+                recommendation = 'You might need to eat a bit more to meet your energy needs.';
+            } else {
+                recommendation = 'You are on track today!';
+            }
+            document.getElementById('recommendation').textContent = `Recommendation: ${recommendation}`;
+        }
+
+        document.getElementById('cancelButton').addEventListener('click', function() {
+            window.location.href = '/dashboard'; 
+        });
+    </script>
+</body>
+</html>

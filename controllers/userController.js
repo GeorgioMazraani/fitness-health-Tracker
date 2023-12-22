@@ -1,5 +1,13 @@
-const { getUsers, insertUser, updateUser, deleteUser, getUser, getUserDetailsWithMostBadges } = require(`../services/userService`);
+const { getUsers, insertUser, updateUser, deleteUser, getUser, getUserDetailsWithMostBadges, loginUser, searchUsersByUsername } = require(`../services/userService`);
+const { getRelationshipStatus } = require('../services/friendService');
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+async function hashPassword(password) {
+    return bcrypt.hash(password, saltRounds);
+}
+
 
 /**
  * Controller to retrieve all users.
@@ -58,12 +66,26 @@ const insertUserController = async (req, res) => {
     const { username, password, email, age, weight, height, gender, goal } = req.body;
 
     try {
-        const response = await insertUser(username, password, email, age, weight, height, gender, goal);
-        res.status(201).json({ response });
+        const userID = await insertUser(username, password, email, age, weight, height, gender, goal);
+
+
+        res.redirect(`/insertGoals/${userID}`);
     } catch (error) {
         res.status(500).json({ message: error?.message });
     }
 };
+
+
+// In userController.js or a similar file
+
+const renderLogin = async (req, res) => {
+    res.render('login');
+};
+const renderRegister = async (req, res) => {
+    res.render('register');
+};
+
+
 
 /**
  * Controller to update an existing user's details.
@@ -75,22 +97,45 @@ const insertUserController = async (req, res) => {
  * @param {Object} res - The response object.
  */
 const updateUserController = async (req, res) => {
-    const errors = validationResult(req);
+    const { password, username, email, age, weight, height, gender, goal } = req.body;
+    const userID = req.params.userID;
 
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { userID, username, password, email, age, weight, height, gender, goal } = req.body;
-    if (!userID) {
-        return res.status(400).json({ message: "missing user id" });
+
+    let updateParams = { username, email, age, weight, height, gender, goal };
+
+    if (password && password.trim() !== '') {
+        updateParams.password = await hashPassword(password);
     }
+
     try {
-        const response = await updateUser(userID, username, password, email, age, weight, height, gender, goal);
-        res.status(201).json({ response });
+        await updateUser(userID, updateParams);
+        res.redirect('/dashboard');
     } catch (error) {
-        res.status(500).json({ error: error?.message });
+        console.error(error); // Log the error for debugging
+        res.status(500).send(error.message);
     }
 };
+
+
+// In your userController.js
+const renderUpdate = async (req, res) => {
+    try {
+        const userID = req.params.userID;
+        const user = await getUser(userID);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        res.render('profile', { user: user });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+
 
 /**
  * Controller to delete a user.
@@ -126,6 +171,80 @@ const getUserDetailsWithMostBadgesController = async (req, res) => {
         res.status(500).json({ message: error?.message });
     }
 };
+const loginUserController = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        let user = await loginUser(email, password);
+        if (user) {
+            // If user is authenticated, save their information in the session
+            req.session.user = { userID: user.userID, username: user.username };
+
+            console.log("Session after login", req.session);
+
+            res.redirect('/dashboard');
+        } else {
+            // If authentication fails, redirect back to the login page with an error
+            res.redirect('/login?error=invalid_credentials');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).send('An error occurred during login.');
+    }
+};
+
+const searchUsersController = async (req, res) => {
+    try {
+        const searchTerm = req.query.username;
+        if (!searchTerm) {
+            return res.status(400).render('error', { message: "Search term is required." });
+        }
+
+        const users = await searchUsersByUsername(searchTerm);
+
+        // Render the searchResults view with users data
+        res.render('search', { users });
+    } catch (error) {
+        res.status(500).render('error', { message: error.message });
+    }
+};
+const getUserProfileController = async (req, res) => {
+    try {
+        const profileUserID = req.params.userID;
+        const currentUserID = req.session.user.userID; 
+
+        const user = await getUser(profileUserID);
+        const relationshipStatus = await getRelationshipStatus(currentUserID, profileUserID);
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        res.render('userProfile', {
+            user: user,
+            currentUserID: currentUserID, 
+            profileUserID: profileUserID, 
+            relationshipStatus: relationshipStatus
+        });
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+const logoutController = async (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error('Logout error:', err);
+            res.status(500).send('An error occurred while logging out.');
+        } else {
+            res.clearCookie('connect.sid'); // Clears the session cookie
+            res.redirect('/login');
+        }
+    });
+
+};
+
+
+
 
 
 module.exports = {
@@ -134,5 +253,12 @@ module.exports = {
     insertUserController,
     updateUserController,
     deleteUserController,
-    getUserDetailsWithMostBadgesController
+    getUserDetailsWithMostBadgesController,
+    loginUserController,
+    renderLogin,
+    renderRegister,
+    searchUsersController,
+    getUserProfileController,
+    renderUpdate,
+    logoutController
 }

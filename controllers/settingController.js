@@ -10,14 +10,27 @@ const { validationResult } = require('express-validator');
  * @param {Object} res - The response object.
  */
 const getSettingsController = async (req, res) => {
-    const { userID } = req.body;
+
+    const userID = req.params.userID;
+
     try {
-        const settingsID = await getSettings(userID);
-        res.status(200).json({ usersettings: settingsID });
+
+        const settings = await getSettings(userID);
+
+        if (settings.length > 0) {
+        
+
+            res.render('settings', { userID: userID, settings: settings[0] });
+
+        } else {
+       
+            res.render('settings', { settings: null, userID: userID });
+        }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).render('error', { message: error.message });
     }
 };
+
 
 /**
  * Controller to save or update a user's settings.
@@ -29,19 +42,24 @@ const getSettingsController = async (req, res) => {
  * @param {Object} res - The response object.
  */
 const saveSettingsController = async (req, res) => {
-    const errors = validationResult(req);
+ 
+    req.body.notificationsEnabled = req.body.notificationsEnabled ? '1' : '0';
+    console.log("Received data:", req.body);
 
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const usersettings = req.body;
+
     try {
-        const savedSetting = await saveSettings(usersettings);
-        res.status(200).json({ usersettings: savedSetting }); // Return the saved settings from the database
+        await saveSettings(req.body); 
+        res.redirect('/dashboard'); // Redirect to the dashboard after saving settings
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+
 
 module.exports = {
     getSettingsController,

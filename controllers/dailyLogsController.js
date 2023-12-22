@@ -16,13 +16,16 @@ const { validationResult } = require('express-validator');
  */
 const getDailyLogsController = async (req, res) => {
   try {
-    const { userID } = req.body; 
+    const { userID } = req.params; 
     const logs = await getDailyLogs(userID);
-    res.json({ dailyLogs: logs });
+
+    // Render the dailyLogs.ejs view and pass the logs data to it
+    res.render('dailyLogs', { dailyLogs: logs });
   } catch (error) {
     res.status(500).send(error.message);
   }
 };
+
 
 /**
  * Controller for retrieving a specific daily log.

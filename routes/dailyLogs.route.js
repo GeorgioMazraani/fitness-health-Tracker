@@ -10,7 +10,7 @@ const { validateDailyLog, validateDeleteDailyLog } = require('../validations/dai
 const router = express.Router();
 
 // Route to get all daily logs for a user
-router.get('/dailylogs', getDailyLogsController);
+router.get('/dailylogs/:userID', getDailyLogsController);
 
 // Route to get a specific daily log
 router.get('/dailylog', getDailyLogController);

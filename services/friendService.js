@@ -45,14 +45,13 @@ const addFriend = async (userID1, userID2) => {
             VALUES (?, ?, 'Pending')`;
 
         await query(insertSql, [userID1, userID2]);
-        // Create a notification object
+      
         const notification = {
             userID: userID2,
             content: `User ${userID1} has sent you a friend request.`,
-            dateCreated: new Date() // Ensures the dateCreated property is not undefined
+            dateCreated: new Date() 
         };
 
-        // Create a notification for the user who is being added
         await addNotification(notification);
 
         return { status: 'requested' };
@@ -133,9 +132,8 @@ const acceptFriend = async (userID1, userID2) => {
 
         await query(acceptSql, [userID1, userID2, userID2, userID1]);
 
-        // Notify the user who sent the friend request
         await addNotification({
-            userID: userID1, // userID of the requester
+            userID: userID1, 
             content: `User ${userID2} has accepted your friend request.`,
             dateCreated: new Date()
         });
@@ -186,6 +184,37 @@ const getPendingFriends = async (userID) => {
     }
 };
 
+
+const getRelationshipStatus = async (currentUserID, profileUserID) => {
+    try {
+        const sql = `
+            SELECT status FROM friends
+            WHERE (userID1 = ? AND userID2 = ?) OR (userID1 = ? AND userID2 = ?)`;
+
+        const values = [currentUserID, profileUserID, profileUserID, currentUserID];
+        const result = await query(sql, values);
+
+        if (result.length > 0) {
+            const status = result[0].status;
+            switch (status) {
+                case 'Pending':
+            
+                    return result[0].userID1 === currentUserID ? 'pending' : 'requested';
+                case 'Accepted':
+                    return 'friends';
+                case 'Blocked':
+                    return 'blocked';
+                default:
+                    return 'none';
+            }
+        } else {
+            return 'none'; // No relationship found
+        }
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
 module.exports = {
     getFriends,
     addFriend,
@@ -193,5 +222,6 @@ module.exports = {
     removeFriend,
     blockFriend,
     getBlockedFriends,
-    getPendingFriends
+    getPendingFriends,
+    getRelationshipStatus
 }
